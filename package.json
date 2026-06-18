@@ -1,0 +1,20 @@
+{
+  "name": "new-project6-10",
+  "version": "1.0.0",
+  "description": "Challenge Manager platform",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "test": "echo \"No tests yet\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "express": "^5.2.1",
+    "multer": "^2.2.0"
+  }
+}
