@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Challenge Manager MVP</title>
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">CM</div>
+        <div>
+          <strong>Challenge Manager</strong>
+          <p>MVP Prototype</p>
+        </div>
+      </div>
+
+      <section class="role-switcher">
+        <p class="section-label">현재 모드</p>
+        <div class="segmented" id="roleSwitch"></div>
+      </section>
+
+      <nav class="nav" id="nav"></nav>
+
+      <section class="sidebar-card">
+        <p class="section-label">핵심 원칙</p>
+        <ul>
+          <li>상태가 먼저 보이는 UI</li>
+          <li>수동 검수형 MVP</li>
+          <li>정산 흐름 가시화</li>
+        </ul>
+      </section>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">대시보드</h1>
+          <p id="pageSubtitle">챌린지 운영 상태를 확인하세요.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="ghost-btn" id="resetButton">샘플 데이터 초기화</button>
+        </div>
+      </header>
+
+      <section id="flash"></section>
+      <section id="view"></section>
+    </main>
+  </div>
+
+  <template id="statCardTemplate">
+    <article class="stat-card">
+      <p class="stat-label"></p>
+      <strong class="stat-value"></strong>
+      <span class="stat-footnote"></span>
+    </article>
+  </template>
+
+  <script src="./app.js"></script>
+</body>
+</html>
