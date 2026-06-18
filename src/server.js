@@ -10,6 +10,8 @@ const app = express();
 const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT || 4175);
 const PUBLIC_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
+const NODE_ENV = process.env.NODE_ENV || "development";
+const ENABLE_DEMO_SEED = parseBooleanEnv(process.env.ENABLE_DEMO_SEED, NODE_ENV !== "production");
 const DATA_DIR = path.join(process.cwd(), "data");
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const DB_PATH = path.join(DATA_DIR, "challenge-manager.db");
@@ -57,6 +59,8 @@ app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     date: new Date().toISOString(),
+    environment: NODE_ENV,
+    demoSeedEnabled: ENABLE_DEMO_SEED,
     provider: paymentGateway.provider,
     baseUrl: PUBLIC_BASE_URL
   });
@@ -664,6 +668,8 @@ function ensureColumn(tableName, columnName, definition) {
 }
 
 function seedIfEmpty() {
+  bootstrapAdminIfNeeded();
+  if (!ENABLE_DEMO_SEED) return;
   ensureUsersSeeded();
 
   const count = db.prepare("SELECT COUNT(*) AS count FROM challenges").get().count;
@@ -1179,6 +1185,11 @@ function isStrongPassword(password) {
   return value.length >= 8 && /[A-Za-z]/.test(value) && /\d/.test(value);
 }
 
+function parseBooleanEnv(value, defaultValue) {
+  if (value === undefined) return defaultValue;
+  return ["1", "true", "yes", "on"].includes(String(value).trim().toLowerCase());
+}
+
 function ensureUsersSeeded() {
   const count = db.prepare("SELECT COUNT(*) AS count FROM users").get().count;
   if (count > 0) return;
@@ -1186,6 +1197,27 @@ function ensureUsersSeeded() {
   insertUser.run("me", "참가자 A", "participant@example.com", hashPassword("demo1234"), "participant");
   insertUser.run("organizer-1", "운영자 A", "organizer@example.com", hashPassword("demo1234"), "organizer");
   insertUser.run("admin-1", "관리자 A", "admin@example.com", hashPassword("demo1234"), "admin");
+}
+
+function bootstrapAdminIfNeeded() {
+  const count = db.prepare("SELECT COUNT(*) AS count FROM users").get().count;
+  if (count > 0) return;
+
+  const adminEmail = String(process.env.BOOTSTRAP_ADMIN_EMAIL || "").trim().toLowerCase();
+  const adminPassword = String(process.env.BOOTSTRAP_ADMIN_PASSWORD || "").trim();
+  const adminName = String(process.env.BOOTSTRAP_ADMIN_NAME || "Platform Admin").trim();
+
+  if (!adminEmail || !adminPassword) return;
+  if (!isValidEmail(adminEmail)) {
+    throw new Error("BOOTSTRAP_ADMIN_EMAIL 형식이 올바르지 않습니다.");
+  }
+  if (!isStrongPassword(adminPassword)) {
+    throw new Error("BOOTSTRAP_ADMIN_PASSWORD는 8자 이상이며 영문과 숫자를 포함해야 합니다.");
+  }
+
+  db.prepare("INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)")
+    .run(crypto.randomUUID(), adminName, adminEmail, hashPassword(adminPassword), "admin");
+  insertAuditLog("system", "초기 관리자 생성", adminEmail);
 }
 
 function migrateExistingPasswords() {
