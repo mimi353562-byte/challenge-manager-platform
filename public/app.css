@@ -1,0 +1,124 @@
+:root {
+  --bg: #f4f7fb;
+  --panel: #ffffff;
+  --panel-soft: #eef3fb;
+  --line: #d7dfec;
+  --text: #172033;
+  --muted: #657089;
+  --brand: #1757d6;
+  --brand-strong: #0d3b98;
+  --accent: #ff7a1a;
+  --success: #1f9d55;
+  --warning: #c88400;
+  --danger: #d92d20;
+  --shadow: 0 16px 40px rgba(19, 35, 71, 0.08);
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(23, 87, 214, 0.16), transparent 32%),
+    linear-gradient(180deg, #f9fbff 0%, var(--bg) 100%);
+  color: var(--text);
+  font-family: "Segoe UI", "Noto Sans KR", sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  padding: 24px 18px;
+  border-right: 1px solid rgba(215, 223, 236, 0.7);
+  background: linear-gradient(180deg, rgba(224, 245, 214, 0.94) 0%, rgba(214, 239, 201, 0.92) 100%);
+}
+
+.brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.brand-mark {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  color: white;
+  font-weight: 800;
+}
+
+.section-label {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.segmented {
+  display: flex;
+  padding: 4px;
+  background: var(--panel-soft);
+  border-radius: 999px;
+  gap: 4px;
+}
+
+.segmented button {
+  flex: 1;
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 12px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.segmented button.active {
+  background: white;
+  color: var(--brand-strong);
+  box-shadow: var(--shadow);
+  font-weight: 700;
+}
+
+.nav {
+  display: grid;
+  gap: 10px;
+  margin: 24px 0;
+}
+
+.nav button.active {
+  background: linear-gradient(135deg, rgba(23, 87, 214, 0.12), rgba(255, 122, 26, 0.08));
+  border-color: rgba(23, 87, 214, 0.18);
+}
+
+.sidebar-card {
+  padding: 16px;
+  background: rgba(244, 251, 239, 0.86);
+  border: 1px solid rgba(150, 188, 132, 0.28);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+
+.main {
+  padding: 28px;
+}
