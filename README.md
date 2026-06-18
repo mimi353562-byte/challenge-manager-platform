@@ -43,14 +43,42 @@
 - `TOSS_SECRET_KEY`: 토스 시크릿 키
 - `TOSS_API_BASE_URL`: 토스 API 엔드포인트
 
-## 배포 체크리스트
+## Railway 배포
 
-1. `npm install --omit=dev`
-2. `APP_BASE_URL`를 실제 도메인으로 설정
-3. 운영 환경에서는 `PAYMENT_PROVIDER=mock` 대신 실제 PG 설정 사용
-4. `/api/health` 응답 확인
-5. `data/`, `public/uploads/`는 서버 쓰기 권한이 있어야 함
-6. 리버스 프록시(Nginx, Railway, Render 등) 사용 시 필요하면 `TRUST_PROXY=1` 설정
+Railway 공식 문서 기준으로 `railway.toml`에서 빌드/시작/헬스체크 설정을 코드로 관리할 수 있으므로, 이 저장소는 [`railway.toml`](/C:/Users/user/OneDrive/문서/New%20project6-10/railway.toml:1)을 포함해 바로 배포할 수 있게 구성했습니다.
+
+### Railway에서 설정할 것
+
+1. GitHub 저장소 연결
+2. Root Directory는 비워두기
+3. 환경 변수 입력
+4. 최초 배포 후 `/api/health` 성공 확인
+
+### Railway 권장 환경 변수
+
+- `HOST=0.0.0.0`
+- `APP_BASE_URL=https://실제-railway-도메인`
+- `TRUST_PROXY=1`
+- `PAYMENT_PROVIDER=mock`
+
+실제 결제 연동 시에는 아래도 추가합니다.
+
+- `TOSS_CLIENT_KEY`
+- `TOSS_SECRET_KEY`
+- `TOSS_API_BASE_URL=https://api.tosspayments.com`
+
+### Railway 배포 동작
+
+- 빌드: Railway Railpack이 `package.json`과 `package-lock.json`을 기준으로 자동 설치
+- 시작 명령: `npm start`
+- 헬스체크: `/api/health`
+- 재시작 정책: 실패 시 자동 재시도 3회
+
+### 주의 사항
+
+- `data/`와 `public/uploads/`는 컨테이너 로컬 저장소이므로 재배포 시 영속성이 없습니다.
+- 지금 구조는 SQLite + 로컬 업로드 기반이라, 실제 운영 단계에서는 Railway Volume 또는 외부 스토리지/S3, 외부 DB 이전이 필요합니다.
+- `APP_BASE_URL`을 실제 Railway 도메인으로 넣지 않으면 결제 콜백 URL과 외부 링크 계산이 잘못될 수 있습니다.
 
 ## 운영 실행
 
