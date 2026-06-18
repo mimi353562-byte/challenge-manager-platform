@@ -24,11 +24,38 @@
   - 정산 승인
   - 분쟁/이의제기 답변
 
-## 실행 방법
+## 로컬 실행 방법
 
 1. `cmd /c npm.cmd install`
 2. `cmd /c npm.cmd run dev`
 3. 브라우저에서 `http://127.0.0.1:4175/` 접속
+
+## 배포용 환경 변수
+
+`.env.example` 기준으로 아래 값을 설정하면 됩니다.
+
+- `HOST`: 서버 바인딩 주소, 배포 환경에서는 기본값 `0.0.0.0` 사용
+- `PORT`: 서버 포트
+- `APP_BASE_URL`: 외부에서 접근하는 실제 서비스 URL
+- `TRUST_PROXY`: 리버스 프록시 환경이면 `1`
+- `PAYMENT_PROVIDER`: `mock` 또는 `toss`
+- `TOSS_CLIENT_KEY`: 토스 클라이언트 키
+- `TOSS_SECRET_KEY`: 토스 시크릿 키
+- `TOSS_API_BASE_URL`: 토스 API 엔드포인트
+
+## 배포 체크리스트
+
+1. `npm install --omit=dev`
+2. `APP_BASE_URL`를 실제 도메인으로 설정
+3. 운영 환경에서는 `PAYMENT_PROVIDER=mock` 대신 실제 PG 설정 사용
+4. `/api/health` 응답 확인
+5. `data/`, `public/uploads/`는 서버 쓰기 권한이 있어야 함
+6. 리버스 프록시(Nginx, Railway, Render 등) 사용 시 필요하면 `TRUST_PROXY=1` 설정
+
+## 운영 실행
+
+- 시작: `npm start`
+- 헬스체크: `GET /api/health`
 
 ## 데모 계정
 
@@ -50,6 +77,7 @@
 - 운영자 확정 -> 관리자 승인 -> 지급 완료 흐름 포함
 - 운영자는 본인이 소유한 챌린지만 관리 가능
 - 참가자/운영자/관리자별 수익화 지표와 지갑 요약 제공
+- 서버는 `SIGINT`, `SIGTERM` 수신 시 정상 종료 처리
 
 ## 다음 단계 권장
 

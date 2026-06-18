@@ -7,7 +7,9 @@ const multer = require("multer");
 const { createPaymentGateway } = require("./payment-gateway");
 
 const app = express();
+const HOST = process.env.HOST || "0.0.0.0";
 const PORT = Number(process.env.PORT || 4175);
+const PUBLIC_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
 const DATA_DIR = path.join(process.cwd(), "data");
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const DB_PATH = path.join(DATA_DIR, "challenge-manager.db");
@@ -21,6 +23,10 @@ fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 const db = new Database(DB_PATH);
 db.pragma("journal_mode = WAL");
 const paymentGateway = createPaymentGateway();
+
+if (process.env.TRUST_PROXY === "1") {
+  app.set("trust proxy", 1);
+}
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -48,7 +54,12 @@ initSchema();
 seedIfEmpty();
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, date: new Date().toISOString() });
+  res.json({
+    ok: true,
+    date: new Date().toISOString(),
+    provider: paymentGateway.provider,
+    baseUrl: PUBLIC_BASE_URL
+  });
 });
 
 app.post("/api/auth/login", (req, res) => {
@@ -482,9 +493,20 @@ app.get(/.*/, (_req, res) => {
   res.sendFile(path.join(process.cwd(), "public", "index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`Challenge Manager server running at http://127.0.0.1:${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`Challenge Manager server running at ${PUBLIC_BASE_URL}`);
 });
+
+function shutdown(signal) {
+  console.log(`${signal} received. Shutting down Challenge Manager server...`);
+  server.close(() => {
+    db.close();
+    process.exit(0);
+  });
+}
+
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
 
 function initSchema() {
   db.exec(`
@@ -1136,8 +1158,7 @@ function buildOrderId() {
 }
 
 function buildAbsoluteUrl(pathname) {
-  const base = process.env.APP_BASE_URL || `http://127.0.0.1:${PORT}`;
-  return new URL(pathname, base).toString();
+  return new URL(pathname, PUBLIC_BASE_URL).toString();
 }
 
 function escapeHtmlText(value) {

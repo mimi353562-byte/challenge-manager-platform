@@ -1,5 +1,5 @@
 {
-  "name": "new-project6-10",
+  "name": "challenge-manager-platform",
   "version": "1.0.0",
   "description": "Challenge Manager platform",
   "main": "src/server.js",
@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "better-sqlite3": "^12.11.1",
     "express": "^5.2.1",

@@ -4,3 +4,4 @@ public/uploads/
 *.log
 .env
 .env.*
+!.env.example
